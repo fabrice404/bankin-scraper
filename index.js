@@ -79,10 +79,19 @@ module.exports = {
       $ = cheerio.load(transactionsElement);
       $('ul.transactionList li').each((i, transaction) => {
         if ($(transaction).attr('id')) {
-          const date = moment(
-            $(transaction).find('.headerDate').first().text(),
-            ['dddd, MMM D, YYYY'],
-          ).format('YYYY-MM-DD');
+          const dateCell = $(transaction).find('.headerDate')
+            .first()
+            .text()
+            .trim();
+
+          let date;
+          if (dateCell === 'Today') {
+            date = moment().format('YYYY-MM-DD');
+          } else if (dateCell === 'Yesterday') {
+            date = moment().add(-1, 'day').format('YYYY-MM-DD');
+          } else {
+            date = moment(dateCell, ['dddd, MMM D, YYYY']).format('YYYY-MM-DD');
+          }
 
           const name = $(transaction).find('.fw6').text().trim();
           const amount = getAmountFromText($(transaction).find('.amount').text());
